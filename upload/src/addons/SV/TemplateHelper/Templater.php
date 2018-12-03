@@ -26,12 +26,9 @@ class Templater
         }
         $templater->addFunction('abs', $func);
 
-        // work-around XF2.0.10 & earlier bug (load Less_Tree_Url so Less_Tree_URL maps as expected)
-        // assume it is fixed in XF2.0.11
-        if (\XF::$versionId < 2001170)
-        {
-            \class_exists('Less_Tree_Url');
-        }
+        // work-around XF2.0.11 & earlier bug (load Less_Tree_Url so Less_Tree_URL maps as expected)
+        // load the class anyway, as it is a single disk or opcode cache hit
+        \class_exists('Less_Tree_Url');
     }
 
     /**
