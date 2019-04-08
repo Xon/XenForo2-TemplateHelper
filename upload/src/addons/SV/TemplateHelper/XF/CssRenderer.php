@@ -19,6 +19,7 @@ class CssRenderer extends XFCP_CssRenderer
     public function parseLessColorFuncValue($value)
     {
         $parser = $this->getFreshLessParser();
+        $parser->SetOption('compress', false);
 
         $value = '@someVar: ' . $value . '; #test { color: @someVar; }';
         $value = $this->prepareLessForRendering($value);
@@ -29,10 +30,19 @@ class CssRenderer extends XFCP_CssRenderer
         }
         catch (\Exception $e)
         {
+            if (\XF::$debugMode)
+            {
+                // Note: this is intentionally triggering a warning rather than an exception. This will commonly
+                // trigger in templates and we will still be able to render in that case.
+                trigger_error("parse_less_func({$value}) render error:" . $e->getMessage(), E_USER_WARNING);
+            }
+
+            \XF::logException($e, false, "parse_less_func({$value}) render error:");
+
             return null;
         }
 
-        preg_match('/color:\s*(.*?)\s*;\s*}$/si', $css, $matches);
+        preg_match('/color:\s*(.*?)\s*;?\s*}$/si', $css, $matches);
 
         if (!$matches || !isset($matches[1]))
         {
